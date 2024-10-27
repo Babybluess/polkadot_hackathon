@@ -10,13 +10,19 @@ export type PriceToken = {
 export interface PoolSlice {
   poolList: Pool[];
   priceList: PriceToken[];
+  contractAddress: string;
+  collateralAmount: BigInt;
   fetchPool: () => Promise<void>;
   addPrice: (token: string, price: number) => void;
+  setContractAddress: (item: string) => void;
+  setCollateralAmount: (item: BigInt) => void;
 };
 
 export const createPoolSlice: ImmerStateCreator<PoolSlice> = (set) => ({
   poolList: [],
   priceList: [],
+  contractAddress: "",
+  collateralAmount: BigInt(0),
 
   fetchPool: async () => {
     const res = await PoolService.getAllPool();
@@ -40,4 +46,16 @@ export const createPoolSlice: ImmerStateCreator<PoolSlice> = (set) => ({
       })
     });
   },
+
+  setContractAddress: (address: string) => {
+    set((state) => {
+      state.contractAddress = address;
+    })
+  },
+
+  setCollateralAmount: (item: BigInt) => {
+    set((state) => {
+      state.collateralAmount = item;
+    })
+  }
 });

@@ -24,13 +24,9 @@ export class PoolController {
   @Post('pool')
   async createPool(@Body() body: createPoolDto) {
     const pool = await this.poolService.createPool(body);
-    const user = await this.userService.getAccountByAddress(body.creator);
-    const user_pool = await this.poolService.createUserPool(user.id, pool.id);
-    return new ResponseMessage(200, 'Create pool successfully', {
-      pool: pool,
-      user: user,
-      relation_id: user_pool,
-    });
+    // const user = await this.userService.getAccountByAddress(body.creator);
+    // const user_pool = await this.poolService.createUserPool(user.id, pool.id);
+    return new ResponseMessage(200, 'Create pool successfully', pool);
   }
 
   @Get('pools')

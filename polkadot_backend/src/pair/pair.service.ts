@@ -34,7 +34,7 @@ export class PairService {
   }
 
   async getAllPair() {
-    return await this.prisma.pairToken.findMany();
+    return (await this.prisma.pairToken.findMany()).sort();
   }
 
   async getPair (paidId: string) {

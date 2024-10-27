@@ -14,23 +14,23 @@ interface createNewPair {
 }
 
 class CreatePairService {
-  createPool = async (data: createNewPair) => {
-    return await API.PATCH<ApiResponse<Pair>>("/pair", data);
+  createPair = async (data: createNewPair) => {
+    return await API.POST<ApiResponse<Pair>>("/pair", data);
   };
 
-  getPool = async (poolId: string) => {
+  getPair = async (poolId: string) => {
     return await API.GET<ApiResponse<Pair>>(`/pair/${poolId}`);
   };
 
-  getAllPool = async () => {
+  getAllPair = async () => {
     return await API.GET<ApiResponse<Pair[]>>("/pairs");
   };
 
-  updatePool = async (pairId: string, data: createNewPair) => {
+  updatePair = async (pairId: string, data: createNewPair) => {
     return await API.PATCH<ApiResponse<Pair>>("/pair", { pairId, data });
   };
 
-  deletePool = async (pairId: string) => {
+  deletePair = async (pairId: string) => {
     return await API.DELETE<ApiResponse<Pair>>(`/pair/${pairId}`);
   };
 }

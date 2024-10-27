@@ -7,12 +7,12 @@ interface createNewPool {
   creator: string;
   collateral_amount: number;
   profit: number;
-  expire: String;
+  expire: number;
 }
 
 class CreatePoolService {
   createPool = async (data: createNewPool) => {
-    return await API.PATCH<ApiResponse<Pool>>("/pool", data);
+    return await API.POST<ApiResponse<Pool>>("/pool", data);
   };
 
   getPool = async (poolId: string) => {

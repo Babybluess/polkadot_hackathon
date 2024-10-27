@@ -1,10 +1,10 @@
 import { useReadContract, useWriteContract } from "wagmi";
 import { pool_abis } from "@/common/abi/pool_abi";
 
-export function readContractTemplalte(name: string, args: any[], chainId: number) {
+export function readContractTemplalte(name: string, args: any[], chainId: number, address: string) {
   const data = useReadContract({
     chainId: chainId,
-    address: `0x${process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT}`,
+    address: `0x${address}`,
     functionName: name,
     abi: pool_abis,
     args,

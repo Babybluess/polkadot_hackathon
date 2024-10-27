@@ -7,8 +7,7 @@ import { Button, TextField } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import TokenMenu from "./farms/TokenMenu";
-import { chainList } from "@/const";
-import { useAccount, useChains, useWriteContract } from "wagmi";
+import { useAccount, useWriteContract } from "wagmi";
 import {
   health_ratio_thread,
   lendingTimeList,
@@ -16,22 +15,20 @@ import {
 } from "@/const/pool.const";
 import { pool_abis } from "@/common/abi/pool_abi";
 import InputCollateral from "./common/InputCollateral";
-import { readContractTemplalte, writeAsyncContractTemplate } from "@/common/blockchain/ethereum/eth_template";
 import { useStore } from "@/store/useStore";
 import { Pair } from "@/types";
 import PairCard from "./farms/PairCard";
 import { token_abis } from "@/common/abi/token_abi";
-import { PoolService } from "@/service";
-import { sepolia } from "viem/chains";
+import { PairService, PoolService } from "@/service";
 
 function FarmModal({ isOpen, setOpen }: { isOpen: boolean; setOpen: any }) {
   const [name, setName] = useState<string>("");
   const [expire, setExpire] = useState<any>();
   const [interestRate, setInterestRate] = useState<string>("");
   const { address } = useAccount();
-  const { pairList, network } = useStore();
+  const { pairList, contractAddress, setCollateralAmount } = useStore();
   const [pairId, setPairId] = useState<string>("");
-  const [collateralAmount, setCollateralAmount] = useState<number>(0);
+  const [collateralAmount, setCollateralAmounts] = useState<any>(0);
   const [lendPrice, setLendPrice] = useState<number>(0);
   const [collateralPrice, setCollateralPrice] = useState<number>(0);
   const { writeContractAsync } = useWriteContract();
@@ -39,24 +36,14 @@ function FarmModal({ isOpen, setOpen }: { isOpen: boolean; setOpen: any }) {
     lendPrice * standard_uint,
     collateralPrice * standard_uint,
   ];
-
-  const poolAddress = useMemo(() => {
-    switch (network) {
-      case "Ethereum":
-        return process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT;
-      case "Moonbeam":
-        return process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT;
-      default:
-        return process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT;
-    }
-  }, []);
+  const pairs = [pairList[1], pairList[5], pairList[4], pairList[0], pairList[2], pairList[3]];
 
   const handleCreateFarm = async () => {
     if (address && selectedPair !== undefined) {
       const lend_amount = selectedPair?.lend_amount * 10 ** standard_uint;
       const newPool = await writeContractAsync({
         abi: pool_abis,
-        address: `0x${poolAddress}`,
+        address: `0x${contractAddress}`,
         functionName: "createPool",
         args: [
           {
@@ -66,19 +53,32 @@ function FarmModal({ isOpen, setOpen }: { isOpen: boolean; setOpen: any }) {
             expire: BigInt(expire.value),
             profit: BigInt(interestRate)
           },
-          tokenInfo,
         ],
       });
 
       const approve = await writeContractAsync({
         abi: token_abis,
-        address: `0x${selectedPair?.lend_token.substring(1)}`,
+        address: `0x${selectedPair?.lend_token.substring(2)}`,
         functionName: "approve",
         args: [
-          `0x${poolAddress}`,
+          `0x${contractAddress}`,
           BigInt(lend_amount),
         ],
       });
+
+      // setCollateralAmount(BigInt(collateralAmount * 10 ** standard_uint))
+
+      // const poolDto = {
+      //   pairId: selectedPair.id,
+      //   name,
+      //   creator: address,
+      //   borrower: "0x0",
+      //   collateral_amount: Math.round(collateralAmount),
+      //   profit: Number(interestRate),
+      //   expire: Number(expire.value)
+      // }
+
+      // const newPoolDb = await PoolService.createPool(poolDto)
     } else {
       alert("Please log in Metamask");
     }
@@ -230,7 +230,7 @@ function FarmModal({ isOpen, setOpen }: { isOpen: boolean; setOpen: any }) {
           <InputCollateral
             tokenInfo={tokenInfo}
             lend_amount={selectedPair.lend_amount}
-            setAmount={setCollateralAmount}
+            setAmount={setCollateralAmounts}
             interest_rate={health_ratio_thread}
           />
           <Button onClick={handleCreateFarm}>Create pool</Button>
@@ -242,14 +242,15 @@ function FarmModal({ isOpen, setOpen }: { isOpen: boolean; setOpen: any }) {
           </Typography>
           <Box
             sx={{
-              display: "grid",
-              gridAutoFlow: "column",
+              display: "flex",
               gridAutoColumns: "30%",
               justifyContent: "space-between",
               width: "100%",
+              flexWrap: "wrap",
+              gap: "10px"
             }}
           >
-            {pairList.map((item: Pair, index: number) => (
+            {pairs.map((item: Pair, index: number) => (
               <PairCard
                 key={index}
                 index={index.toString()}

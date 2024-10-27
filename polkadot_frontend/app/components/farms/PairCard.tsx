@@ -1,3 +1,5 @@
+import { moonbeamIndex, moonbeamPair } from "@/const/menu.const";
+import { useStore } from "@/store/useStore";
 import { Pair } from "@/types";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,8 +14,10 @@ function PairCard({
   pair: Pair;
   handleSelectPair: (item: Pair, index: string) => void;
 }) {
-  return (
-    <div className="w-full h-[15vh] rounded-xl border-2 border-gray-400 p-5 bg-black flex flex-col justify-center">
+  const { contractAddress } = useStore();
+  const isMoonbeam = contractAddress === process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT;
+  return ( 
+    <div className="w-[20vw] h-[15vh] rounded-xl border-2 border-gray-400 p-5 bg-black flex flex-col justify-center">
       <div className="flex justify-between">
         <div className="flex">
           <img
@@ -38,7 +42,7 @@ function PairCard({
         <FontAwesomeIcon
           icon={faArrowRight}
           className="w-5 h-5 p-2 rounded-xl bg-orange-300 cursor-pointer hover:translate-x-3 hover:transition-transform hover:duration-200"
-          onClick={() => handleSelectPair(pair, index)}
+          onClick={() => handleSelectPair(pair, isMoonbeam ? moonbeamPair : index)}
         />
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useStore } from "@/store/useStore";
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/react";
+import { useEffect } from "react";
 import { moonbaseAlpha, sepolia } from "viem/chains";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { metaMask } from "wagmi/connectors";
@@ -9,18 +10,23 @@ function ConnectMetamask({ network }: { network: string}) {
   const { disconnect } = useDisconnect();
   const { connect } = useConnect();
   const { address } = useAccount();
-  const { setNetwork } = useStore();
+  const { setNetwork, setContractAddress } = useStore();
 
   const connectWallet = async () => {
     if (network == "Ethereum") {
       connect({chainId: sepolia.id, connector: metaMask()});
       setNetwork("Ethereum")
+      if (process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT !== undefined) {
+        setContractAddress(process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT)
+      }
     } else {
       connect({chainId: moonbaseAlpha.id, connector: metaMask()});
       setNetwork("Moonbeam")
+      if (process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT !== undefined) {
+        setContractAddress(process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT)
+      }
     }
   };
-
   return (
     <div>
       {address ? (

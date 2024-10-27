@@ -1,12 +1,12 @@
 import React from "react";
-import Table from "../common/Table";
 import Pagination from "../common/Pagination";
+import TransactionTable from "./transactionTable";
 
 function TransactionPage() {
   return (
     <div className="w-full h-full p-5 flex flex-col items-end gap-5">
       <div className="w-full h-[95%]">
-        <Table />
+        <TransactionTable/>
       </div>
       <Pagination />
     </div>

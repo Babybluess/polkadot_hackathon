@@ -9,9 +9,6 @@ export class createPoolDto {
 
     @ApiProperty()
     creator: string;
-   
-    @ApiProperty()
-    borrower: string;
 
     @ApiProperty()
     collateral_amount: number;

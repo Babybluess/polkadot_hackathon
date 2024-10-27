@@ -10,7 +10,7 @@ import InputCollateral from "../common/InputCollateral";
 import { Button } from "@headlessui/react";
 import { health_ratio_thread, standard_uint } from "@/const/pool.const";
 import { useWriteContract } from "wagmi";
-import { eth_pool_abis } from "@/common/abi/pool_abi";
+import { pool_abis } from "@/common/abi/pool_abi";
 
 function EditBoard({
   isOpen,
@@ -44,7 +44,7 @@ function EditBoard({
 
   const handleEditPool = async () => {
     const execute = await writeContractAsync({
-      abi: eth_pool_abis,
+      abi: pool_abis,
       address: `0x${process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT}`,
       functionName: "editPool",
       args: [
@@ -85,11 +85,11 @@ function EditBoard({
               Lend token
             </Typography>
             <TokenMenu
-              chain={[]}
               selectedToken={lendObject}
-              setToken={setLendToken}
+              tokenType="LendToken"
               price={lendPrice}
               setPrice={setLendPrice}
+              labelToken=""
             />
           </Box>
           <Box>
@@ -97,11 +97,11 @@ function EditBoard({
               Collateral token
             </Typography>
             <TokenMenu
-              chain={[]}
               selectedToken={collateralObject}
-              setToken={setCollateralToken}
+              tokenType="CollateralToken"
               price={collateralPrice}
               setPrice={setCollateralPrice}
+              labelToken=""
             />
           </Box>
         </Box>
@@ -179,9 +179,7 @@ function EditBoard({
           tokenInfo={tokenInfo}
           lend_amount={Number(lendAmount)}
           setAmount={setCollateralAmount}
-          decimals={lendToken.decimals}
-          mul_rate={health_ratio_thread}
-          div_rate={standard_uint}
+          interest_rate={health_ratio_thread}
         />
         <Button className=" font-semibold" onClick={() => handleEditPool()}>
           Change pool

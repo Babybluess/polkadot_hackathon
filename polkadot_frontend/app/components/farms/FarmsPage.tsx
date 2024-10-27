@@ -1,48 +1,34 @@
-import React, { useMemo, useState } from "react";
-import { farmList } from "@/const/menu.const";
-import Pagination from "../common/Pagination";
-import DetailFarm from "./DetailFarm";
-import { add } from "@/utils/math.utils";
-import { readContractTemplalte } from "@/common/blockchain/ethereum/eth_template";
-import PairCard from "./PairCard";
+import React, { useMemo } from "react";
+import Table from "../common/Table";
+import { useStore } from "@/store/useStore";
+import { useAccount, useReadContract } from "wagmi";
+import { moonbaseAlpha, sepolia } from "viem/chains";
+import { pool_abis } from "@/common/abi/pool_abi";
+import { moonbeamIndex } from "@/const/menu.const";
 
 function FarmsPage() {
-  const [selectedCard, setSeletedCard] = useState<any>(null);
-  const [lendToken, setLendToken] = useState<any>(null);
-  const [collateralToken, setCollateralToken] = useState<any>(null);
-  const [tokenPrice, setTokenPrice] = useState([])
-  // const poolList = readContractTemplalte("listPools", []);
+  const { poolList, contractAddress } = useStore();
+  const { address } = useAccount();
+  const isMoonbeam = contractAddress === process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT;
+  
+  const moonbeamData = useReadContract({
+    chainId: moonbaseAlpha.id,
+    address: `0x${contractAddress}`,
+    functionName: "getAllPool",
+    abi: pool_abis,
+    args: [],
+  });
 
-  const total_APY = add(farmList);
+  const data = useReadContract({
+    chainId: sepolia.id,
+    address: `0x${contractAddress}`,
+    functionName: "getAllPool",
+    abi: pool_abis,
+    args: [],
+  });
   return (
-    <div className="w-full h-full px-5 pt-5 py-2 flex flex-col justify-between">
-      {selectedCard ? (
-        <DetailFarm
-          pool={selectedCard}
-          setSelectedFarm={setSeletedCard}
-          totalDeposits={total_APY}
-          lendToken={lendToken}
-          collateralToken={collateralToken}
-        />
-      ) : (
-        <React.Fragment>
-          <div className="w-full h-[50%] grid grid-cols-6 gap-3">
-            {/* {poolList.data
-              ? Object.keys(poolList.data).map((item: any) => (
-                  <PairCard
-                    pool={poolList.data}
-                    index={item}
-                    key={item}
-                    setSeletedCard={setSeletedCard}
-                    setLendToken={setLendToken}
-                    setCollateralToken={setCollateralToken}
-                    setTokenPrice={setTokenPrice}
-                  />
-                ))
-              : null} */}
-          </div>
-        </React.Fragment>
-      )}
+    <div className="w-full h-full px-5 py-5 flex flex-col justify-between">
+      <Table poolLists={isMoonbeam ? moonbeamData.data : data.data} role="EarnPool" />
     </div>
   );
 }

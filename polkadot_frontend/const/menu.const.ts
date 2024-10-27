@@ -291,6 +291,14 @@ export const farmList: FarmsList[] = [
 ]
 
 export const header = ["Pool", "Lender", "Lend amount", "Interest rate", "Expire", "Farming"];
+export const headerLendPool = ["Pool", "Borrower", "Lend amount", "Interest rate", "Expire", "Farming"];
+
+// export const moonbeamIndex: string ="5";
+// export const moonbeamPair: string ="0";
+export const moonbeamIndex: string = process.env.NEXT_PUBLIC_MOONBEAM_INDEX || "5";
+export const moonbeamPair: string = process.env.NEXT_PUBLIC_MOONBEAM_PAIR || "0";
+
+export const transactionHeader = ["Hash", "Sender", "Reveiver", "Token", "Amount", "Contract"]
 export const body = [
     {
         pool: "Uniswap v3",

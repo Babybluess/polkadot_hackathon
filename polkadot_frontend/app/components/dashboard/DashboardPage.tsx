@@ -1,24 +1,42 @@
-import React from "react";
-import Chart from "./LineChart";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowTrendDown,
-  faArrowTrendUp,
-} from "@fortawesome/free-solid-svg-icons";
-import { LatestTransactions } from "@/const/menu.const";
+import React, { useMemo } from "react";
 import Rewards from "../common/Rewards";
-import { readContractTemplalte } from "@/common/blockchain/ethereum/eth_template";
-import Pool from "./PoolList";
+import { useStore } from "@/store/useStore";
+import { useAccount, useReadContract } from "wagmi";
+import Table from "../common/Table";
+import { moonbaseAlpha, sepolia } from "viem/chains";
+import { pool_abis } from "@/common/abi/pool_abi";
+import { moonbeamIndex } from "@/const/menu.const";
 
 function DashboardPage() {
-  const poolList = readContractTemplalte("listPools", []);
+  const { poolList, contractAddress } = useStore();
+  const isMoonbeam = contractAddress === process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT;
+  
+  const moonbeamData = useReadContract({
+    chainId: moonbaseAlpha.id,
+    address: `0x${contractAddress}`,
+    functionName: "getAllPool",
+    abi: pool_abis,
+    args: [],
+  });
+
+  const data = useReadContract({
+    chainId: sepolia.id,
+    address: `0x${contractAddress}`,
+    functionName: "getAllPool",
+    abi: pool_abis,
+    args: [],
+  });
+
   return (
     <div className="w-full h-full p-5 flex flex-col gap-5">
       {/* firt session */}
-      <div className="flex h-[50%] justify-between gap-5 w-full">
+      <div className="h-[50%] flex flex-col gap-5 w-full">
         <span className="text-green-500 text-xl font-semibold">
           My Borrowing Pool
         </span>
+        <div className="h-[90%]">
+          <Table poolLists={isMoonbeam ? moonbeamData.data : data.data} role="BorrowPool"/>
+        </div>
       </div>
       {/* second session */}
       <div className="w-full h-1/2 flex flex-col gap-5">
@@ -31,22 +49,17 @@ function DashboardPage() {
         </div>
         <div className="w-full h-full flex gap-5">
           {/* my farm */}
-          <div className="w-[70%] flex flex-col gap-3">
-            {poolList.data
-              ? Object.keys(poolList.data).map((item: string) => (
-                  <Pool pool={poolList.data} index={item} />
-                ))
-              : null}
+          <div className="w-[80%] h-[80%]">
+            <Table poolLists={isMoonbeam ? moonbeamData.data : data.data} role="LendPool" />
           </div>
-          {/* awards */}
-          <div className="w-[30%] flex flex-col gap-3">
-            <div className="h-[30%]">
+          <div className="w-[20%] flex flex-col gap-3">
+            <div className="h-[25%]">
               <Rewards />
             </div>
-            <div className="h-[30%]">
+            <div className="h-[25%]">
               <Rewards />
             </div>
-            <div className="h-[30%]">
+            <div className="h-[25%]">
               <Rewards />
             </div>
           </div>

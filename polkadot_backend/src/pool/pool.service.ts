@@ -17,9 +17,9 @@ export class PoolService {
       expire,
     } = data;
 
-    return this.prisma.pool.create({
+    return await this.prisma.pool.create({
       data: {
-        pairId,
+        pairId: pairId,
         name,
         creator,
         collateral_amount,

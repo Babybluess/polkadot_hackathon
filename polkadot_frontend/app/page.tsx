@@ -1,19 +1,39 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MainContext, SideBar } from "./components";
 import ConnectButton from "@/common/connect-wallet/ConnectButton";
 import FarmModal from "./components/FarmModal";
 import { useStore } from "@/store/useStore";
 
 export default function Home() {
-  const [network, setNetwork] = useState<string>("Ethereum");
+  const [network, setNetworks] = useState<string>("Ethereum");
   const [selectedPage, setSlectedPage] = useState<string>("Home");
   const [isOpen, setOpen] = useState<boolean>(false);
-  const { fetchPair, fetchPool} = useStore()
+  const { fetchPair, fetchPool, fetchTransaction, setContractAddress, setPairList, pairList } = useStore()
+
+  const poolAddress = useMemo(() => {
+    switch (network) {
+      case "Ethereum":
+        const evmAddress = process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT;
+        if (evmAddress !== undefined) {
+          setContractAddress(evmAddress)
+          return evmAddress;
+        }
+      case "Moonbeam":
+        const moonbeamAddress = process.env.NEXT_PUBLIC_MOONBEAM_SMART_CONTRACT
+        if (moonbeamAddress !== undefined) {
+          setContractAddress(moonbeamAddress)
+          return moonbeamAddress;
+        }
+      default:
+        return process.env.NEXT_PUBLIC_EVM_SMART_CONTRACT;
+    }
+  }, [network]);
 
   useEffect(() => {
     fetchPair()
     fetchPool()
+    fetchTransaction()
   }, [])
   return (
     <div className="w-screen h-screen bg-gradient-to-br from-[#d9a7c7] to-[#fffcdc] shadow-inner shadow-slate-700 overflow-hidden">
@@ -44,7 +64,7 @@ export default function Home() {
             {isOpen ? <FarmModal isOpen={isOpen} setOpen={setOpen} /> : null}
           </div>
         </div>
-        <ConnectButton network={network} setNetwork={setNetwork} />
+        <ConnectButton network={network} setNetwork={setNetworks} />
       </div>
       <div className="w-full h-[90%] flex">
         <SideBar selectedPage={selectedPage} setSelectedPage={setSlectedPage} />
