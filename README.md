@@ -69,13 +69,13 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 First, run the development server:
 
 ```bash
-npm run start
+npm run start:dev
 # or
-yarn start
+yarn start:dev
 # or
-pnpm start
+pnpm start:dev
 # or
-bun start
+bun start:dev
 ```
 
 Open [http://localhost:3005/api](http://localhost:3005/api) with your browser to see the result.
